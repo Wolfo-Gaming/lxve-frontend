@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('../partials/header') %>
+</head>
+
+<body class="hold-transition skin-blue fixed sidebar-mini">
+    <div class="wrapper">
+        <%- include('../partials/navbar', {user: user}) %>
+        <aside class="main-sidebar">
+            <section class="sidebar">
+                <ul class="sidebar-menu tree" data-widget="tree">
+
+                    <li class="1">
+                        <a href="/account">
+                                <i class="fa fa-user"></i> <span>My Account</span>
+                            </a>
+                    </li>
+                    <li class="1">
+                        <a href="/account/security">
+                                <i class="fa fa-lock"></i> <span>Security Controls</span>
+                            </a>
+                    </li>
+                    <li class="1">
+                        <a href="/account/api">
+                                <i class="fa fa-code"></i> <span>Account API</span>
+                            </a>
+                    </li>
+                    <li class="active">
+                        <a href="/client">
+                                <i class="fa fa-server"></i> <span>My Servers</span>
+                            </a>
+                    </li>
+                </ul>
+            </section>
+        </aside>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>Your Servers<small>Servers you have access to.</small></h1>
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li class="active">Servers</li>
+                </ol>
+            </section>
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-header">
+                                <h3 class="box-title">Server List</h3>
+                                <div class="box-tools search01">
+                                    <form action="/" method="GET">
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" name="query" class="form-control pull-right" value="" placeholder="Search">
+                                            <div class="input-group-btn">
+                                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-center">Status</th>
+                                            <th>Name</th>
+                                        
+                                            <th>Type</th>
+                                            <th class="text-center hidden-sm hidden-xs">CPU</th>
+                                            <th class="text-center hidden-sm hidden-xs">Memory</th>
+                                            <th class="text-center hidden-sm hidden-xs">Disk</th>
+                                            <th class="text-center hidden-sm hidden-xs">Processes</th>
+                                            <th>Node</th>
+                                        </tr>
+                                        <% servers.forEach(server => { %>
+                                            <tr class="dynamic-update" data-server="<%= server.name %>@<%= server.node_name %>">
+                                                <% if (server.state.status == "Running") { %>
+                                                    <td class="text-center">
+                                                        <span class="label label-success">Online</span>
+                                                    </td>
+                                                <% } else if (server.state.status == "Stopped")  { %>
+                                                    <td class="text-center">
+                                                        <span class="label label-danger">Offline</span>
+                                                    </td>
+                                                <% } else { %>
+                                                    <td class="text-center">
+                                                        <span class="label label-warning">Error</span>
+                                                    </td>
+                                                <% } %>
+    
+                                                <td><a href="/client/instance/<%= server.name %>@<%= server.node_name %>"><%= server.name %></a></td>
+                                        
+                                                <td><%= server.type %></td>
+                                                
+                                                <td class="text-center hidden-sm hidden-xs"><%= server.fetched_state.cpu %>%</td>
+                                                <td class="text-center hidden-sm hidden-xs"><%= server.fetched_state.memory.used %> / <%= server.fetched_state.memory.limit %></td>
+                                                <td class="text-center hidden-sm hidden-xs"><%= server.fetched_state.disk.usage %></td>
+                                                <td class="text-center hidden-sm hidden-xs"><%= server.state.processes ? server.state.processes : 0 %></td>
+                                                <td><%= server.node_name %></td>
+                                            </tr>
+                                        <% }) %>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="control-sidebar-bg"></div>
+    </div>
+    <script src="/js/keyboard.polyfill.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script>
+        keyboardeventKeyPolyfill.polyfill();
+    </script>
+
+    <script src="/js/laroute.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/jquery/jquery.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/sweetalert/sweetalert.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/bootstrap/bootstrap.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/slimscroll/jquery.slimscroll.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/adminlte/app.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/socketio/socket.io.v203.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/bootstrap-notify/bootstrap-notify.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/js/autocomplete.js?t=170608a5266f48d1f615f57483a043d0"></script>
+
+    <script>
+        $('#logoutButton').on('click', function(event) {
+            event.preventDefault();
+
+            var that = this;
+            swal({
+                title: 'Do you want to log out?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d9534f',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Log out'
+            }, function() {
+                window.location = $(that).attr('href');
+            });
+        });
+    </script>
+
+    <script>
+        $('tr.server-description').on('mouseenter mouseleave', function(event) {
+            $(this).prev('tr').css({
+                'background-color': (event.type === 'mouseenter') ? '#f5f5f5' : '',
+            });
+        });
+    </script>
+    <script src="/themes/pterodactyl/js/frontend/serverlist.js"></script>
+</body>
+
+</html>

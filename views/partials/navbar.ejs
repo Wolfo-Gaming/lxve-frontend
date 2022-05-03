@@ -1,0 +1,31 @@
+<header class="main-header">
+    <div class="logo">
+
+    </div>
+    <nav class="navbar navbar-static-top">
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+        <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+                <li class="user-menu">
+                    <a href="/account">
+                            <img src="/images/default-user-image.png" class="user-image" alt="User Image">
+                            <span class="hidden-xs">wolfo wolfo</span>
+                        </a>
+                </li>
+                <% if (user.admin == true) { %>
+                    <li>
+                        <li><a href="/admin" data-toggle="tooltip" data-placement="bottom" title="Admin Control Panel"><i class="fa fa-gears"></i></a></li>
+                    </li>
+                <% } %>
+                <li>
+                    <li><a href="/auth/logout" id="logoutButton" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="fa fa-sign-out"></i></a></li>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>

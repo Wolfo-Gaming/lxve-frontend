@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('../../partials/header') %>
+        <script src="/js/xterm.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.min.js" integrity="sha512-+wh8VA1djpWk3Dj9/IJDu6Ufi4vVQ0zxLv9Vmfo70AbmYFJm0z3NLnV98vdRKBdPDV4Kwpi7EZdr8mDY9L8JIA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css"
+            integrity="sha512-iLYuqv+v/P4u9erpk+KM83Ioe/l7SEmr7wB6g+Kg1qmEit8EShDKnKtLHlv2QXUp7GGJhmqDI+1PhJYLTsfb8w=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+            integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body class="hold-transition skin-blue fixed sidebar-mini">
+    <div class="wrapper">
+        <%- include('../../partials/navbar', {user: user}) %>
+            <aside class="main-sidebar">
+                <section class="sidebar">
+                    <div class="user-panel">
+                        <div class="info">
+                            <p>
+                                <% if (server.metadata.status=="Running" ) { %>
+                                    <i class="fa fa-circle text-success"></i>
+                                    <% } else if (server.metadata.status=="Stopped" ) { %>
+                                        <i class="fa fa-circle text-danger"></i>
+                                        <% } else {%>
+                                            <i class="fa fa-circle text-warning"></i>
+                                            <% } %>
+                                                <%= server.metadata.name %>
+                            </p>
+                            <p style="font-size: 13px;"><i class="fa-solid fa-microchip"></i><span
+                                    style="font-weight:normal;">
+                                    <%= server.fetched_state.cpu %>%
+                                </span></p>
+                            <p style="font-size: 13px;"><i class="fa-solid fa-memory"></i><span
+                                    style="font-weight:normal;">
+                                    <%= server.fetched_state.memory.used %>
+                                </span></p>
+                        </div>
+                    </div>
+                    <ul class="sidebar-menu tree" data-widget="tree">
+                        <li class="header">ACCOUNT MANAGEMENT</li>
+                        <li class="1">
+                            <a href="/account">
+                                <i class="fa fa-user"></i> <span>My Account</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="/account/security">
+                                <i class="fa fa-lock"></i> <span>Security Controls</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="/account/api">
+                                <i class="fa fa-code"></i> <span>Account API</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="/">
+                                <i class="fa fa-server"></i> <span>My Servers</span>
+                            </a>
+                        </li>
+                        <li class="1">
+                            <a href="/">
+                                <i class="fa fa-network-wired"></i> <span>Networks</span>
+                            </a>
+                        </li>
+                        <li class="header">SERVER MANAGEMENT</li>
+                        <li class="active">
+                            <a href="/server/9d192475">
+                                <i class="fa fa-terminal"></i> <span>Console</span>
+                                <span class="pull-right-container muted muted-hover" href="/server/9d192475/console"
+                                    id="console-popout">
+                                    <span class="label label-default pull-right" style="padding: 3px 5px 2px 5px;">
+                                        <i class="fa fa-external-link"></i>
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/server/9d192475/files">
+                                <i class="fa fa-folder"></i><span>File Management</span>
+                            </a>
+                        </li>
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="fa fa-network-wired"></i>
+                                <span>Network Management</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
+                                        Bridge Configuration</a></li>
+                                <li class="1"><a href="/server/9d192475/settings/allocation"><i
+                                            class="fa fa-angle-right"></i> Port Forwardings</a></li>
+                            </ul>
+                        </li>
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="fa fa-tablet-screen-button"></i>
+                                <span>Apps and Software</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
+                                        App Store</a></li>
+                                <li class="1"><a href="/server/9d192475/settings/allocation"><i
+                                            class="fa fa-angle-right"></i> Installed Apps</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="/server/9d192475/schedules">
+                                <i class="fa fa-calendar"></i> <span>Schedules</span>
+                                <span class="pull-right-container">
+                                    <span class="label label-primary pull-right">1</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/server/9d192475/databases">
+                                <i class="fa fa-database"></i> <span>Databases</span>
+                            </a>
+                        </li>
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="fa fa-gears"></i>
+                                <span>Configuration</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
+                                        Server Name</a></li>
+                                <li class="1"><a href="/server/9d192475/settings/allocation"><i
+                                            class="fa fa-angle-right"></i> Allocation Settings</a></li>
+                                <li class="1"><a href="/server/9d192475/settings/sftp"><i class="fa fa-angle-right"></i>
+                                        SFTP Settings</a></li>
+                                <li class="1"><a href="/server/9d192475/settings/startup"><i
+                                            class="fa fa-angle-right"></i> Startup Parameters</a></li>
+                            </ul>
+                        </li>
+                        <li class="header">ADMINISTRATIVE</li>
+                        <li>
+                            <a href="/admin/servers/view/1" target="_blank">
+                                <i class="fa fa-cog"></i> <span>Server Configuration</span>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+            </aside>
+            <div class="content-wrapper">
+
+                <section class="content">
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-xs-12">
+                            <div class="box">
+
+                                <div class="box-body position-relative">
+                                    <div id="terminal"></div>
+                                </div>
+                                <div class="box-footer text-center">
+                                    <button class="btn btn-success" data-attr="power" data-action="start">Start</button>
+                                    <button class="btn btn-primary" data-attr="power"
+                                        data-action="restart">Restart</button> <button class="btn btn-danger"
+                                        data-attr="power" data-action="stop">Stop</button> <button
+                                        class="btn btn-danger" data-attr="power" data-action="kill">Kill</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Memory Usage</h3>
+                                </div>
+                                <div class="box-body">
+                                    <canvas id="chart_memory" style="max-height:300px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="box box-primary">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">CPU Usage</h3>
+                                </div>
+                                <div class="box-body">
+                                    <canvas id="chart_cpu" style="max-height:300px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <footer class="main-footer">
+                <div class="pull-right small text-gray" style="margin-right:10px;margin-top:-7px;">
+                    <strong><i class="fa fa-fw fa-code-fork"></i></strong> 0.7.19<br />
+                    <strong><i class="fa fa-fw fa-clock-o"></i></strong> 0.047s
+                </div>
+                Copyright &copy; 2015 - 2021 <a href="https://pterodactyl.io/">Pterodactyl Software</a>.
+            </footer>
+            <aside class="control-sidebar control-sidebar-dark">
+                <div class="tab-content">
+                    <ul class="control-sidebar-menu">
+                        <li>
+                            <a href="/server/9d192475" class="active">
+                                <i class="menu-icon fa fa-user bg-blue"></i>
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">asdsdasd</h4>
+                                    <p></p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+            <div class="control-sidebar-bg"></div>
+    </div>
+    <script src="/js/keyboard.polyfill.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script>
+        keyboardeventKeyPolyfill.polyfill();
+    </script>
+
+    <script src="/js/laroute.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/jquery/jquery.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/sweetalert/sweetalert.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/bootstrap/bootstrap.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script
+        src="/themes/pterodactyl/vendor/slimscroll/jquery.slimscroll.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/adminlte/app.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/socketio/socket.io.v203.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script
+        src="/themes/pterodactyl/vendor/bootstrap-notify/bootstrap-notify.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/js/autocomplete.js?t=170608a5266f48d1f615f57483a043d0"></script>
+
+    <script>
+        $('#logoutButton').on('click', function (event) {
+            event.preventDefault();
+
+            var that = this;
+            swal({
+                title: 'Do you want to log out?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d9534f',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Log out'
+            }, function () {
+                window.location = $(that).attr('href');
+            });
+        });
+    </script>
+
+    <script>
+        const terminalContainer = document.getElementById('terminal');
+        var term = new Terminal({});
+        var fitAddon = new FitAddon.FitAddon()
+        term.loadAddon(fitAddon)
+        term.loadAddon(new window.AttachAddon.AttachAddon(new WebSocket('<%= server.ws_url %>')));
+        term.open(terminalContainer);
+        fitAddon.fit()
+        window.onresize = function () {
+            fitAddon.fit()
+        }
+    </script>
+    <script src="/themes/pterodactyl/vendor/ansi/ansi_up.js"></script>
+    <script src="/themes/pterodactyl/vendor/mousewheel/jquery.mousewheel-min.js"></script>
+    <script src="/themes/pterodactyl/vendor/chartjs/chart.min.js"></script>
+    <script src="/themes/pterodactyl/vendor/jquery/date-format.min.js"></script>
+    <script src="/themes/pterodactyl/js/plugins/minecraft/eula.js"></script>
+</body>
+
+</html>
