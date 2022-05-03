@@ -12,7 +12,7 @@ const path = require('path');
 const db = new DBClient("mongodb://localhost:27017/", "panel")
 console.log('DB connected')
 const app = express()
-
+require('express-ws')(app)
 passport.serializeUser(function (user, done) {
     done(null, user._id.toString());
 });
@@ -64,6 +64,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) return next();
+    console.log('unauthed')
     res.redirect('/auth/login');
 }
 function isAdmin(req, res, next) {

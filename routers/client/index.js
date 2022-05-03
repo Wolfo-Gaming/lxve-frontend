@@ -1,10 +1,11 @@
 const express = require('express')
+const res = require('express/lib/response')
 const { isLoggedIn, db } = require('../..')
 const axios = require('axios').default
 const router = express.Router()
 const pretty = require('../../lib/pretty')
 router.use(isLoggedIn)
-
+require('express-ws')(router)
 router.get('/', async (req, res) => {
     var nodes = await db.fetchNodes()
     var servers = []
@@ -39,16 +40,21 @@ router.get('/', async (req, res) => {
 router.get('/instance/:servernode', async (req, res) => {
     var server = req.params.servernode.split('@')[0]
     var node = req.params.servernode.split('@')[1]
+
     var node_info = await db.fetchNodeFromName(node)
     var server_url = `${node_info.connection}://${node_info.host}:${node_info.port}/api/v1/instance/${server}`
     var server = await axios.get(server_url)
     var state =( await axios.get(server_url + '/state')).data
-    var ws_console_data = (await axios.post(server_url + '/console', {type: server.data.metadata.type == "container" ? "serial" : "vga"})).data
-    console.log(ws_console_data)
+    if (state.state == "Running") {
+        var ws_console_data = (await axios.post(server_url + '/console', {type: server.data.metadata.type == "container" ? "serial" : "vga"})).data
+        console.log(ws_console_data)
+    }
+
     res.render('client/instance', {
         user: req.user,
         server: {
-            ws_url: (node_info.connection == "http" ? "ws://" : "wss://") + node_info.host + ":" + node_info.port + "/api/v1/instance/" + server.data.metadata.name + "/console?token=" + ws_console_data.access_token,
+            control_ws_url: 'ws://10.17.167.166:3030/client/instance/' + req.params.servernode + '/resources',
+            ws_url: state.state != "Running" ? null :((node_info.connection == "http" ? "ws://" : "wss://") + node_info.host + ":" + node_info.port + "/api/v1/instance/" + server.data.metadata.name + "/console?token=" + ws_console_data.access_token),
             ...server.data,
             node_name: node.name,
             fetched_state: {
@@ -62,6 +68,46 @@ router.get('/instance/:servernode', async (req, res) => {
                 }
             }
         }
+    })
+})
+router.ws('/instance/:servernode/resources', async (ws, req) => {
+    //console.log(ws)
+    var server = req.params.servernode.split('@')[0]
+    var node = req.params.servernode.split('@')[1]
+    console.log(node)
+    var node_info = await db.fetchNodeFromName(node)
+    var server_url = `${node_info.connection}://${node_info.host}:${node_info.port}/api/v1/instance/${server}`
+    var int = setInterval(async () => {
+        console.log('interval')
+        try {
+            var state = (await axios.get(server_url + '/state')).data 
+        } catch (error) {
+            ws.close()
+        }
+        ws.send(JSON.stringify({
+            type: "state",
+            state: {
+                state: state.state,
+                cpu: Math.round(state.cpu.percent),
+                memory: {
+                    raw: state.memory.usage,
+                    limit: pretty(state.memory.limit ? state.memory.limit : 0),
+                    used: pretty(state.memory.usage),
+                },
+                disk: {
+                    usage: pretty(state.disk["root"] ? state.disk["root"].usage : state.disk.usage),
+                }
+            }
+        }))
+    },2000)
+    ws.on('message', async (msg) => {
+        var data = JSON.parse(msg)
+        if (data.type == "powerstate") {
+            ws.send(JSON.stringify({type: "response", response:(await axios.post(server_url + '/state?action='+data.powerstate)).data})) 
+        }
+    })
+    ws.on('close', () => {
+        clearInterval(int)
     })
 })
 

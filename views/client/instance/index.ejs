@@ -4,7 +4,10 @@
 <head>
     <%- include('../../partials/header') %>
         <script src="/js/xterm.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.min.js" integrity="sha512-+wh8VA1djpWk3Dj9/IJDu6Ufi4vVQ0zxLv9Vmfo70AbmYFJm0z3NLnV98vdRKBdPDV4Kwpi7EZdr8mDY9L8JIA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.min.js"
+            integrity="sha512-+wh8VA1djpWk3Dj9/IJDu6Ufi4vVQ0zxLv9Vmfo70AbmYFJm0z3NLnV98vdRKBdPDV4Kwpi7EZdr8mDY9L8JIA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css"
             integrity="sha512-iLYuqv+v/P4u9erpk+KM83Ioe/l7SEmr7wB6g+Kg1qmEit8EShDKnKtLHlv2QXUp7GGJhmqDI+1PhJYLTsfb8w=="
             crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -32,11 +35,11 @@
                                                 <%= server.metadata.name %>
                             </p>
                             <p style="font-size: 13px;"><i class="fa-solid fa-microchip"></i><span
-                                    style="font-weight:normal;">
+                                    style="font-weight:normal;" id="cpu-usage">
                                     <%= server.fetched_state.cpu %>%
                                 </span></p>
                             <p style="font-size: 13px;"><i class="fa-solid fa-memory"></i><span
-                                    style="font-weight:normal;">
+                                    style="font-weight:normal;" id="mem-usage">
                                     <%= server.fetched_state.memory.used %>
                                 </span></p>
                         </div>
@@ -173,11 +176,11 @@
                                     <div id="terminal"></div>
                                 </div>
                                 <div class="box-footer text-center">
-                                    <button class="btn btn-success" data-attr="power" data-action="start">Start</button>
-                                    <button class="btn btn-primary" data-attr="power"
-                                        data-action="restart">Restart</button> <button class="btn btn-danger"
-                                        data-attr="power" data-action="stop">Stop</button> <button
-                                        class="btn btn-danger" data-attr="power" data-action="kill">Kill</button>
+                                    <button class="btn btn-success" data-attr="power" data-action="start"
+                                        onclick="start()">Start</button>
+                                    <button class="btn btn-primary" data-attr="power" data-action="restart"
+                                        onclick="restart()">Restart</button> <button class="btn btn-danger"
+                                        data-attr="power" data-action="stop" onclick="stop()">Stop</button>
                                 </div>
                             </div>
                         </div>
@@ -264,18 +267,209 @@
             });
         });
     </script>
+    <script>
 
+    </script>
     <script>
         const terminalContainer = document.getElementById('terminal');
         var term = new Terminal({});
         var fitAddon = new FitAddon.FitAddon()
         term.loadAddon(fitAddon)
-        term.loadAddon(new window.AttachAddon.AttachAddon(new WebSocket('<%= server.ws_url %>')));
-        term.open(terminalContainer);
+        var ws = new WebSocket('<%= server.ws_url %>')
+        ws.onerror = function (error) {
+            console.log('WebSocket Error: ' + error)
+        }
+        ws.onclose = function (e) {
+            location.reload()
+            console.log('WebSocket Connection Closed')
+        }
+        ws.onopen = function (e) {
+            console.log('WebSocket Connection Opened')
+            setTimeout(() => {
+                ws.send('\n')
+            }, 1000)
+
+        }
+        if ('<%= server.metadata.status %>' == "Running") {
+            term.loadAddon(new window.AttachAddon.AttachAddon(ws));
+            term.open(terminalContainer);
+        } else {
+            term.open(terminalContainer);
+            term.writeln('Server is not running.');
+        }
+
         fitAddon.fit()
         window.onresize = function () {
             fitAddon.fit()
         }
+    </script>
+    <script>
+        var control_websocket = new WebSocket('<%= server.control_ws_url %>');
+        var prev_state = '<%= server.metadata.status %>';
+        control_websocket.onmessage = (msg) => {
+            var data = JSON.parse(msg.data);
+            if (data.type == "state") {
+                var powerstate = data.state.state;
+                if (powerstate != prev_state) {
+                    location.reload()
+                }
+                var mem = document.getElementById('mem-usage');
+                var cpu = document.getElementById('cpu-usage');
+                mem.innerText = ' ' + data.state.memory.used;
+                cpu.innerText = ' ' + data.state.cpu + '%';
+                if (TimeLabels.length > 10) {
+                    TimeLabels.shift();
+                    CPUData.shift();
+                    MemoryData.shift();
+                }
+                CPUData.push(data.state.cpu)
+                MemoryData.push(Math.round(data.state.memory.raw * 0.000001))
+
+                TimeLabels.push($.format.date(new Date(), 'HH:mm:ss'));
+                CPUChart.update();
+                MemoryChart.update();
+
+                console.log(CPUData)
+                console.log(MemoryData)
+            }
+        }
+        function start() {
+            control_websocket.send(JSON.stringify({
+                type: "powerstate",
+                powerstate: "start"
+            }));
+        }
+        function stop() {
+            control_websocket.send(JSON.stringify({
+                type: "powerstate",
+                powerstate: "stop"
+            }));
+        }
+        function restart() {
+            control_websocket.send(JSON.stringify({
+                type: "powerstate",
+                powerstate: "restart"
+            }));
+        }
+
+        var ctc = $('#chart_cpu');
+        var TimeLabels = [];
+        var CPUData = [];
+        var CPUChart = new Chart(ctc, {
+            type: 'line',
+            data: {
+                labels: TimeLabels,
+                datasets: [{
+                    label: "Percent Use",
+                    fill: false,
+                    lineTension: 0.03,
+                    backgroundColor: "#3c8dbc",
+                    borderColor: "#3c8dbc",
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: "#3c8dbc",
+                    pointBackgroundColor: "#fff",
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "#3c8dbc",
+                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: CPUData,
+                    spanGaps: false,
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'CPU Usage (as Percent Total)'
+                },
+                legend: {
+                    display: false,
+                },
+                animation: {
+                    duration: 1,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                console.log(context)
+                                return context.formattedValue + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctm = $('#chart_memory');
+        var MemoryData = [];
+        var MemoryChart = new Chart(ctm, {
+            type: 'line',
+            data: {
+                labels: TimeLabels,
+                datasets: [{
+                    label: "Memory Use",
+                    fill: false,
+                    lineTension: 0.03,
+                    backgroundColor: "#3c8dbc",
+                    borderColor: "#3c8dbc",
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: "#3c8dbc",
+                    pointBackgroundColor: "#fff",
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "#3c8dbc",
+                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: MemoryData,
+                    spanGaps: false,
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Memory Usage (in Megabytes)'
+                },
+                legend: {
+                    display: false,
+                },
+                animation: {
+                    duration: 1,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.formattedValue + 'MB';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+
     </script>
     <script src="/themes/pterodactyl/vendor/ansi/ansi_up.js"></script>
     <script src="/themes/pterodactyl/vendor/mousewheel/jquery.mousewheel-min.js"></script>
