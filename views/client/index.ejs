@@ -73,6 +73,7 @@
                                         
                                             <th>Type</th>
                                             <th class="text-center hidden-sm hidden-xs">CPU</th>
+                                            <th class="text-center hidden-sm hidden-xs">CPU Temp</th>
                                             <th class="text-center hidden-sm hidden-xs">Memory</th>
                                             <th class="text-center hidden-sm hidden-xs">Disk</th>
                                             <th class="text-center hidden-sm hidden-xs">Processes</th>
@@ -98,7 +99,20 @@
                                         
                                                 <td><%= server.type %></td>
                                                 
+
+                                              
+
+
                                                 <td class="text-center hidden-sm hidden-xs"><%= server.fetched_state.cpu %>%</td>
+                                                <% if (server.fetched_state.temp <= 50) { %>
+                                                    <td class="text-center">
+                                                        <span class="label label-success"><%= server.fetched_state.temp %>°C</span>
+                                                    </td>
+                                                <% } else  { %>
+                                                    <td class="text-center">
+                                                        <span class="label label-danger"><%= server.fetched_state.temp %>°C</span>
+                                                    </td>
+                                                <% } %>
                                                 <td class="text-center hidden-sm hidden-xs"><%= server.fetched_state.memory.used %> / <%= server.fetched_state.memory.limit %></td>
                                                 <td class="text-center hidden-sm hidden-xs"><%= server.fetched_state.disk.usage %></td>
                                                 <td class="text-center hidden-sm hidden-xs"><%= server.state.processes ? server.state.processes : 0 %></td>
