@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('../../../partials/header') %>
+        <script src="/js/xterm.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.min.js"
+            integrity="sha512-+wh8VA1djpWk3Dj9/IJDu6Ufi4vVQ0zxLv9Vmfo70AbmYFJm0z3NLnV98vdRKBdPDV4Kwpi7EZdr8mDY9L8JIA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css"
+            integrity="sha512-iLYuqv+v/P4u9erpk+KM83Ioe/l7SEmr7wB6g+Kg1qmEit8EShDKnKtLHlv2QXUp7GGJhmqDI+1PhJYLTsfb8w=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+            integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body class="hold-transition skin-blue fixed sidebar-mini">
+    <div class="wrapper">
+        <%- include('../../../partials/navbar', {user: user}) %>
+        <aside class="main-sidebar">
+            <section class="sidebar">
+                <div class="user-panel">
+                    <div class="info">
+                        <p>
+                            <% if (server.metadata.status=="Running" ) { %>
+                                <i class="fa fa-circle text-success"></i>
+                                <% } else if (server.metadata.status=="Stopped" ) { %>
+                                    <i class="fa fa-circle text-danger"></i>
+                                    <% } else {%>
+                                        <i class="fa fa-circle text-warning"></i>
+                                        <% } %>
+                                            <%= server.metadata.name %>
+                        </p>
+                        <p style="font-size: 13px;"><i class="fa-solid fa-microchip"></i><span
+                                style="font-weight:normal;" id="cpu-usage">
+                                <%= server.fetched_state.cpu %>%
+                            </span></p>
+                        <p style="font-size: 13px;"><i class="fa-solid fa-memory"></i><span
+                                style="font-weight:normal;" id="mem-usage">
+                                <%= server.fetched_state.memory.used %>
+                            </span></p>
+                    </div>
+                </div>
+                <ul class="sidebar-menu tree" data-widget="tree">
+                    <li class="header">ACCOUNT MANAGEMENT</li>
+                    <li class="1">
+                        <a href="/account">
+                            <i class="fa fa-user"></i> <span>My Account</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/account/security">
+                            <i class="fa fa-lock"></i> <span>Security Controls</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/account/api">
+                            <i class="fa fa-code"></i> <span>Account API</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/">
+                            <i class="fa fa-server"></i> <span>My Servers</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/">
+                            <i class="fa fa-network-wired"></i> <span>Networks</span>
+                        </a>
+                    </li>
+                    <li class="header">SERVER MANAGEMENT</li>
+                    <li>
+                        <a href="<%= url %>">
+                            <i class="fa fa-terminal"></i> <span>Console</span>
+                            <span class="pull-right-container muted muted-hover" href="<%= url %>"
+                                id="console-popout">
+                                <span class="label label-default pull-right" style="padding: 3px 5px 2px 5px;">
+                                    <i class="fa fa-external-link"></i>
+                                </span>
+                            </span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="<%= url %>/files">
+                            <i class="fa fa-folder"></i><span>File Management</span>
+                        </a>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-network-wired"></i>
+                            <span>Network Management</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
+                                    Bridge Configuration</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/allocation"><i
+                                        class="fa fa-angle-right"></i> Port Forwardings</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-gears"></i>
+                            <span>Configuration</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
+                                    Server Name</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/allocation"><i
+                                        class="fa fa-angle-right"></i> Allocation Settings</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/sftp"><i class="fa fa-angle-right"></i>
+                                    SFTP Settings</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/startup"><i
+                                        class="fa fa-angle-right"></i> Startup Parameters</a></li>
+                        </ul>
+                    </li>
+                    <% if (user.admin == true) { %>
+                        <li class="header">ADMINISTRATIVE</li>
+                    <li>
+                        <a href="/admin/servers/view/1" target="_blank">
+                            <i class="fa fa-cog"></i> <span>Server Configuration</span>
+                        </a>
+                    </li>
+                    <% } %>
+                    
+                </ul>
+            </section>
+        </aside>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>Your Servers<small>Servers you have access to.</small></h1>
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li class="active">Servers</li>
+                </ol>
+            </section>
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"><%= server.current_path %></h3>
+                                <div class="box-tools">
+                                    <a href="/server/9d192475/files/add/">
+                                        <button class="btn btn-success btn-sm btn-icon">
+                                            New File <i class="fa fa-fw fa-file-text-o"></i>
+                                        </button>
+                                    </a>
+                                    <button class="btn btn-sm btn-success btn-icon" data-action="add-folder">
+                                        New Folder <i class="fa fa-fw fa-folder-open-o"></i>
+                                    </button>
+                                    <label class="btn btn-primary btn-sm btn-icon">
+                                        Upload <i class="fa fa-fw fa-upload"></i><input type="file" id="files_touch_target" class="hidden">
+                                    </label>
+                                    <div class="btn-group hidden-xs">
+                                        <button type="button" id="mass_actions" class="btn btn-sm btn-default dropdown-toggle disabled" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Mass Actions <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-massactions">
+                                            <li><a href="#" id="selective-deletion" data-action="selective-deletion">Delete Files <i class="fa fa-fw fa-trash-o"></i></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover" id="file_listing" data-current-dir="/">
+                                    <thead>
+                                        <tr>
+                                            <th class="middle min-size">
+                                                <input type="checkbox" class="select-all-files hidden-xs" data-action="selectAll"><i class="fa fa-refresh muted muted-hover use-pointer" data-action="reload-files" style="font-size:14px;"></i>
+                                            </th>
+                                            <th>File Name</th>
+                                            <th class="hidden-xs">Size</th>
+                                            <th class="hidden-xs">Last Modified</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="append_files_to">
+                                        <% server.dirlist.unshift({name: "..",type: "dir",size: "",path: server.previous_path}) %>
+                                        <% server.dirlist.forEach(element => { %>
+                                            <% if (element.isFile == true) { %>
+                                                <tr data-type="folder">
+                                                    <td class="middle min-size" data-identifier="type">
+                                                        <input type="checkbox" class="select-folder hidden-xs" data-action="addSelection"><i class="fa fa-file-text-o" style="margin-left: 0.859px;"></i>
+                                                    </td>
+                                                    <td data-identifier="name" data-name="logs" data-path="/">
+                                                        <a href="<%= url %>/files?path=<%= server.current_path %>/<%= element.name %>" data-action="directory-view"><%= element.name %></a>
+                                                    </td>
+                                                    <td data-identifier="size" class="hidden-xs"><%= element.size %></td>
+                                                    <td data-identifier="modified" class="hidden-xs">
+                                                        <%= element.mtime %>
+                                                    </td>
+                                                    <td class="min-size">
+                                                        <button class="btn btn-xxs btn-default disable-menu-hide" data-action="toggleMenu" style="padding:2px 6px 0px;"><i class="fa fa-ellipsis-h disable-menu-hide"></i></button>
+                                                    </td>
+                                                </tr>
+                                            <% } else if (element.name == "..") { %>
+                                                <tr data-type="folder">
+                                                    <td class="middle min-size" data-identifier="type">
+                                                        <input type="checkbox" class="select-folder hidden-xs" data-action="addSelection"><i class="fa fa-folder" style="margin-left: 0.859px;"></i>
+                                                    </td>
+                                                    <td data-identifier="name" data-name="logs" data-path="/">
+                                                        <a href="<%= url %>/files?path=<%= server.previous_path %>" data-action="directory-view"><%= element.name %></a>
+                                                    </td>
+                                                    <td data-identifier="size" class="hidden-xs"> </td>
+                                                    <td data-identifier="modified" class="hidden-xs">
+                                                         
+                                                    </td>
+                                                    <td class="min-size">
+                                                        <button class="btn btn-xxs btn-default disable-menu-hide" data-action="toggleMenu" style="padding:2px 6px 0px;"><i class="fa fa-ellipsis-h disable-menu-hide"></i></button>
+                                                    </td>
+                                                </tr>
+                                            <% } else { %>
+                                                <tr data-type="folder">
+                                                    <td class="middle min-size" data-identifier="type">
+                                                        <input type="checkbox" class="select-folder hidden-xs" data-action="addSelection"><i class="fa fa-folder" style="margin-left: 0.859px;"></i>
+                                                    </td>
+                                                    <td data-identifier="name" data-name="logs" data-path="/">
+                                                        <a href="<%= url %>/files?path=<%= server.current_path %>/<%= element.name %>" data-action="directory-view"><%= element.name %></a>
+                                                    </td>
+                                                    <td data-identifier="size" class="hidden-xs"><%= element.size %></td>
+                                                    <td data-identifier="modified" class="hidden-xs">
+                                                        <%= element.mtime %>
+                                                    </td>
+                                                    <td class="min-size">
+                                                        <button class="btn btn-xxs btn-default disable-menu-hide" data-action="toggleMenu" style="padding:2px 6px 0px;"><i class="fa fa-ellipsis-h disable-menu-hide"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                                        <% }) %>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+            <div class="control-sidebar-bg"></div>
+    </div>
+    <script src="/js/keyboard.polyfill.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script>
+        keyboardeventKeyPolyfill.polyfill();
+    </script>
+
+    <script src="/js/laroute.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/jquery/jquery.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/sweetalert/sweetalert.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/bootstrap/bootstrap.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script
+        src="/themes/pterodactyl/vendor/slimscroll/jquery.slimscroll.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/adminlte/app.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/themes/pterodactyl/vendor/socketio/socket.io.v203.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script
+        src="/themes/pterodactyl/vendor/bootstrap-notify/bootstrap-notify.min.js?t=170608a5266f48d1f615f57483a043d0"></script>
+    <script src="/js/autocomplete.js?t=170608a5266f48d1f615f57483a043d0"></script>
+
+    <script>
+        $('#logoutButton').on('click', function (event) {
+            event.preventDefault();
+
+            var that = this;
+            swal({
+                title: 'Do you want to log out?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d9534f',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Log out'
+            }, function () {
+                window.location = $(that).attr('href');
+            });
+        });
+    </script>
+     <script>
+        const terminalContainer = document.getElementById('terminal');
+        var term = new Terminal({});
+        var fitAddon = new FitAddon.FitAddon()
+        term.loadAddon(fitAddon)
+        var ws = new WebSocket('<%= server.ws_url %>')
+        ws.onerror = function (error) {
+            console.log('WebSocket Error: ' + error)
+        }
+        ws.onclose = function (e) {
+            location.reload()
+            console.log('WebSocket Connection Closed')
+        }
+        ws.onopen = function (e) {
+            console.log('WebSocket Connection Opened')
+            setTimeout(() => {
+                ws.send('\n')
+            }, 1000)
+
+        }
+        if ('<%= server.metadata.status %>' == "Running") {
+            term.loadAddon(new window.AttachAddon.AttachAddon(ws));
+            term.open(terminalContainer);
+        } else {
+            term.open(terminalContainer);
+            term.writeln('Server is not running.');
+        }
+
+        fitAddon.fit()
+        window.onresize = function () {
+            fitAddon.fit()
+        }
+    </script>
+    <script>
+        var control_websocket = new WebSocket('<%= server.control_ws_url %>');
+        var prev_state = '<%= server.metadata.status %>';
+        control_websocket.onmessage = (msg) => {
+            var data = JSON.parse(msg.data);
+            if (data.type == "state") {
+                var powerstate = data.state.state;
+                if (powerstate != prev_state) {
+                    location.reload()
+                }
+                var mem = document.getElementById('mem-usage');
+                var cpu = document.getElementById('cpu-usage');
+                mem.innerText = ' ' + data.state.memory.used;
+                cpu.innerText = ' ' + data.state.cpu + '%';
+            }
+        }
+
+
+
+    </script>
+
+    <script src="/themes/pterodactyl/vendor/ansi/ansi_up.js"></script>
+    <script src="/themes/pterodactyl/vendor/mousewheel/jquery.mousewheel-min.js"></script>
+    <script src="/themes/pterodactyl/vendor/chartjs/chart.min.js"></script>
+    <script src="/themes/pterodactyl/vendor/jquery/date-format.min.js"></script>
+    <script src="/themes/pterodactyl/js/plugins/minecraft/eula.js"></script>
+</body>
+
+</html>

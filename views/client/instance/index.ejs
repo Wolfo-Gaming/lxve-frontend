@@ -46,116 +46,90 @@
                     </div>
                     <ul class="sidebar-menu tree" data-widget="tree">
                         <li class="header">ACCOUNT MANAGEMENT</li>
-                        <li class="1">
-                            <a href="/account">
-                                <i class="fa fa-user"></i> <span>My Account</span>
-                            </a>
-                        </li>
-                        <li class="1">
-                            <a href="/account/security">
-                                <i class="fa fa-lock"></i> <span>Security Controls</span>
-                            </a>
-                        </li>
-                        <li class="1">
-                            <a href="/account/api">
-                                <i class="fa fa-code"></i> <span>Account API</span>
-                            </a>
-                        </li>
-                        <li class="1">
-                            <a href="/">
-                                <i class="fa fa-server"></i> <span>My Servers</span>
-                            </a>
-                        </li>
-                        <li class="1">
-                            <a href="/">
-                                <i class="fa fa-network-wired"></i> <span>Networks</span>
-                            </a>
-                        </li>
-                        <li class="header">SERVER MANAGEMENT</li>
-                        <li class="active">
-                            <a href="/server/9d192475">
-                                <i class="fa fa-terminal"></i> <span>Console</span>
-                                <span class="pull-right-container muted muted-hover" href="/server/9d192475/console"
-                                    id="console-popout">
-                                    <span class="label label-default pull-right" style="padding: 3px 5px 2px 5px;">
-                                        <i class="fa fa-external-link"></i>
-                                    </span>
+                    <li class="1">
+                        <a href="/account">
+                            <i class="fa fa-user"></i> <span>My Account</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/account/security">
+                            <i class="fa fa-lock"></i> <span>Security Controls</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/account/api">
+                            <i class="fa fa-code"></i> <span>Account API</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/">
+                            <i class="fa fa-server"></i> <span>My Servers</span>
+                        </a>
+                    </li>
+                    <li class="1">
+                        <a href="/">
+                            <i class="fa fa-network-wired"></i> <span>Networks</span>
+                        </a>
+                    </li>
+                    <li class="header">SERVER MANAGEMENT</li>
+                    <li class="active">
+                        <a href="<%= url %>">
+                            <i class="fa fa-terminal"></i> <span>Console</span>
+                            <span class="pull-right-container muted muted-hover" href="<%= url %>"
+                                id="console-popout">
+                                <span class="label label-default pull-right" style="padding: 3px 5px 2px 5px;">
+                                    <i class="fa fa-external-link"></i>
                                 </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/server/9d192475/files">
-                                <i class="fa fa-folder"></i><span>File Management</span>
-                            </a>
-                        </li>
-                        <li class="treeview">
-                            <a href="#">
-                                <i class="fa fa-network-wired"></i>
-                                <span>Network Management</span>
-                                <span class="pull-right-container">
-                                    <i class="fa fa-angle-left pull-right"></i>
-                                </span>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
-                                        Bridge Configuration</a></li>
-                                <li class="1"><a href="/server/9d192475/settings/allocation"><i
-                                            class="fa fa-angle-right"></i> Port Forwardings</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="#">
-                                <i class="fa fa-tablet-screen-button"></i>
-                                <span>Apps and Software</span>
-                                <span class="pull-right-container">
-                                    <i class="fa fa-angle-left pull-right"></i>
-                                </span>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
-                                        App Store</a></li>
-                                <li class="1"><a href="/server/9d192475/settings/allocation"><i
-                                            class="fa fa-angle-right"></i> Installed Apps</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="/server/9d192475/schedules">
-                                <i class="fa fa-calendar"></i> <span>Schedules</span>
-                                <span class="pull-right-container">
-                                    <span class="label label-primary pull-right">1</span>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/server/9d192475/databases">
-                                <i class="fa fa-database"></i> <span>Databases</span>
-                            </a>
-                        </li>
-                        <li class="treeview">
-                            <a href="#">
-                                <i class="fa fa-gears"></i>
-                                <span>Configuration</span>
-                                <span class="pull-right-container">
-                                    <i class="fa fa-angle-left pull-right"></i>
-                                </span>
-                            </a>
-                            <ul class="treeview-menu">
-                                <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
-                                        Server Name</a></li>
-                                <li class="1"><a href="/server/9d192475/settings/allocation"><i
-                                            class="fa fa-angle-right"></i> Allocation Settings</a></li>
-                                <li class="1"><a href="/server/9d192475/settings/sftp"><i class="fa fa-angle-right"></i>
-                                        SFTP Settings</a></li>
-                                <li class="1"><a href="/server/9d192475/settings/startup"><i
-                                            class="fa fa-angle-right"></i> Startup Parameters</a></li>
-                            </ul>
-                        </li>
-                        <li class="header">ADMINISTRATIVE</li>
+                            </span>
+                        </a>
+                    </li>
+                    <li >
+                        <a href="<%= url %>/files">
+                            <i class="fa fa-folder"></i><span>File Management</span>
+                        </a>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-network-wired"></i>
+                            <span>Network Management</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
+                                    Bridge Configuration</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/allocation"><i
+                                        class="fa fa-angle-right"></i> Port Forwardings</a></li>
+                        </ul>
+                    </li>
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-gears"></i>
+                            <span>Configuration</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li class="1"><a href="/server/9d192475/settings/name"><i class="fa fa-angle-right"></i>
+                                    Server Name</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/allocation"><i
+                                        class="fa fa-angle-right"></i> Allocation Settings</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/sftp"><i class="fa fa-angle-right"></i>
+                                    SFTP Settings</a></li>
+                            <li class="1"><a href="/server/9d192475/settings/startup"><i
+                                        class="fa fa-angle-right"></i> Startup Parameters</a></li>
+                        </ul>
+                    </li>
+                        <% if (user.admin == true) { %>
+                            <li class="header">ADMINISTRATIVE</li>
                         <li>
                             <a href="/admin/servers/view/1" target="_blank">
                                 <i class="fa fa-cog"></i> <span>Server Configuration</span>
                             </a>
                         </li>
+                        <% } %>
                     </ul>
                 </section>
             </aside>
